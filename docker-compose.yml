@@ -1,0 +1,96 @@
+services:
+  # ----------------------------------------------------
+  # Core Database Phase (PostgreSQL)
+  # ----------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: aladdin_postgres
+    environment:
+      POSTGRES_USER: aladdin_user
+      POSTGRES_PASSWORD: aladdin_password
+      POSTGRES_DB: aladdin_db
+    ports:
+      - "5432:5432" # Maps laptop port 5432 to container port 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persists the database physically on your laptop
+    restart: unless-stopped
+
+  # ----------------------------------------------------
+  # In-Memory Cache Phase (Redis)
+  # ----------------------------------------------------
+  redis:
+    image: redis:alpine
+    container_name: aladdin_redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # ----------------------------------------------------
+  # Message Broker Phase (Apache Kafka - KRaft Mode)
+  # ----------------------------------------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: aladdin_kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # KRaft mode — Kafka is its own Brain (No Zookeeper needed)
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      KAFKA_LISTENERS: 'PLAINTEXT_HOST://0.0.0.0:9092,PLAINTEXT://0.0.0.0:19092,CONTROLLER://0.0.0.0:9093'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT_HOST://localhost:9092,PLAINTEXT://kafka:19092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+    restart: unless-stopped
+
+  # ----------------------------------------------------
+  # Analytics Storage & Dashboard Phase (ELK Stack)
+  # ----------------------------------------------------
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: aladdin_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false # Disabled for local development simplicity
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Stop it from eating all your RAM
+    ports:
+      - "9200:9200"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.0
+    container_name: aladdin_kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601" # Access via http://localhost:5601
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.0
+    container_name: aladdin_logstash
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline # Config pipeline physical storage
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m" # Prevent it from taking all your RAM
+    ports:
+      - "5044:5044" # Standard Beats port
+      - "5000:5000" # Our custom TCP port
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+# This tells Docker to create a physical hard drive volume on your host machine
+volumes:
+  postgres_data:
+  elastic_data:

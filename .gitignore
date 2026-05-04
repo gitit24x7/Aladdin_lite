@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.pyc
+
+# Virtual Environment (if you create one later)
+venv/
+env/
+.env
+
+# Logs and temp files we created during debugging
+log_output.txt
+logstash.txt
+temp_logs.txt
+
+# Docker volumes (data stored locally by containers)
+postgres_data/
+elastic_data/
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
