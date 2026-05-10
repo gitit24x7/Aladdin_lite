@@ -18,6 +18,7 @@ class TradeRequest(BaseModel):
     ticker: str
     quantity: int
     trade_time: str
+    price: float
 
 @app.get("/")
 def home():

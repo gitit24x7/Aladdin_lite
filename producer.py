@@ -11,7 +11,8 @@ producer = Producer(config)
 trade_data = {
     "ticker": "TSLA",
     "quantity": "100", 
-    "trade_time": "2026-04-24T12:05:00Z"
+    "trade_time": "2026-04-24T12:05:00Z",
+    "price": "197.50"
 }
 
 #Translate the Dictionary to a JSON string, then to raw Bytes
