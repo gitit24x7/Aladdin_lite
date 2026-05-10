@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# To get the count of documents in the Elasticsearch index
+# We can use this to verify that the data is being ingested by Logstash
+# We can also use this to verify that the data is being ingested by Logstash
+
 #Host details
 HOST="elasticsearch"
 PORT="9200"

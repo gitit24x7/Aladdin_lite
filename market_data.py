@@ -1,3 +1,5 @@
+#This script helps us retrieve the prices of the stocks from the Redis cache, which was stored by the price_worker.py script.
+
 import redis
 
 # 1. Connect to Redis (Our In-Memory Cache)
