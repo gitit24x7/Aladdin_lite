@@ -16,8 +16,18 @@ import time
 redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 # 2. Define the "Universe" of stocks we want to track
-# For testing, we just track 3 popular stocks
-STOCK_UNIVERSE = ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS"]
+STOCK_UNIVERSE = [
+    "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "ICICIBANK.NS", "INFY.NS",
+    "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "LT.NS", "BAJFINANCE.NS",
+    "HINDUNILVR.NS", "AXISBANK.NS", "KOTAKBANK.NS", "ASIANPAINT.NS", "BAJAJFINSV.NS",
+    "MARUTI.NS", "TITAN.NS", "SUNPHARMA.NS", "TATASTEEL.NS", "M&M.NS",
+    "WIPRO.NS", "HCLTECH.NS", "ULTRACEMCO.NS", "NTPC.NS", "NESTLEIND.NS",
+    "POWERGRID.NS", "TECHM.NS", "ONGC.NS", "GRASIM.NS", "ADANIPORTS.NS",
+    "HINDALCO.NS", "JSWSTEEL.NS", "INDUSINDBK.NS", "TATAMOTORS.NS", "DIVISLAB.NS",
+    "CIPLA.NS", "ADANIENT.NS", "BAJAJ-AUTO.NS", "SBILIFE.NS", "HDFCLIFE.NS",
+    "EICHERMOT.NS", "APOLLOHOSP.NS", "BRITANNIA.NS", "DRREDDY.NS", "TATACONSUM.NS",
+    "COALINDIA.NS", "HEROMOTOCO.NS", "BPCL.NS", "UPL.NS", "SHREECEM.NS"
+]
 
 def fetch_and_cache_prices():
     """

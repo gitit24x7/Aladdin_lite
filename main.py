@@ -1,7 +1,20 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from confluent_kafka import Producer
+from market_data import get_live_price
 import json
+
+#following the singleton pattern, we connect to Postgres server, and since this is expensive, we do it at the startup
+db.conn = psycopg2.connect(
+    dbname="postgres",
+    user="postgres",
+    password="[PASSWORD]",
+    host="localhost",
+    port="5432"
+)
+
+#For ACID transactions we turn the autocommit off, so that we can commit only when every transaction is successful, otherwise we roll back
+db_conn.autocommit = False
 
 app = FastAPI()
 
@@ -15,10 +28,10 @@ kafka_producer = Producer(config)
 
 # 2. Tell FastAPI exactly what a "Trade Request" from the dashboard should look like
 class TradeRequest(BaseModel):
+    user_id: int
     ticker: str
     quantity: int
-    trade_time: str
-    price: float
+    action: str
 
 @app.get("/")
 def home():
